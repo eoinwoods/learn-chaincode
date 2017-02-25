@@ -68,19 +68,20 @@ func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function stri
 
 // Query is our entry point for queries
 func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
-	fmt.Println("query is running " + function)
+	fmt.Println("EW query is running " + function)
 
+	fmt.Println("EW function='"+function+"' equality="+function == "read")
 	// Handle different functions
 	if function == "read" {
-		fmt.Println("query is in 'read' branch")
+		fmt.Println("EW query is in 'read' branch")
 		return t.read(stub, args)
 	} else if function == "dummy_query" { //read a variable
-		fmt.Println("hi there " + function) //error
+		fmt.Println("EW hi there " + function) //error
 		return nil, nil
 	}
-	fmt.Println("query did not find func: " + function) //error
+	fmt.Println("EW query did not find func: " + function) //error
 
-	return nil, errors.New("Received unknown function query: " + function)
+	return nil, errors.New("EW Received unknown function query: " + function)
 }
 
 ///
