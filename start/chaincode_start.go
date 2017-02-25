@@ -72,6 +72,7 @@ func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function strin
 
 	// Handle different functions
 	if function == "read" {
+		fmt.Println("query is in 'read' branch")
 		return t.read(stub, args)
 	} else if function == "dummy_query" { //read a variable
 		fmt.Println("hi there " + function) //error
