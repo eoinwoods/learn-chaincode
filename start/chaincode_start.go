@@ -19,8 +19,8 @@ package main
 import (
 	"errors"
 	"fmt"
-
 	"github.com/hyperledger/fabric/core/chaincode/shim"
+	"strconv"
 )
 
 // SimpleChaincode example simple Chaincode implementation
@@ -70,7 +70,7 @@ func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function stri
 func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
 	fmt.Println("EW query is running " + function)
 
-	fmt.Println("EW function='"+function+"' equality="+function == "read")
+	fmt.Println("EW function='" + function + "' equality=" + strconv.FormatBool(function == "read"))
 	// Handle different functions
 	if function == "read" {
 		fmt.Println("EW query is in 'read' branch")
