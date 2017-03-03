@@ -43,6 +43,11 @@ func (t *SimpleChaincode) Init(stub shim.ChaincodeStubInterface, function string
 		return nil, errors.New("Incorrect number of arguments. Expecting 1")
 	}
 
+	err := stub.PutState("hello_world", []byte(args[0]))
+	if err != nil {
+		return nil, err
+	}
+
 	return nil, nil
 }
 
@@ -51,24 +56,70 @@ func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function stri
 	fmt.Println("invoke is running " + function)
 
 	// Handle different functions
-	if function == "init" {													//initialize the chaincode state, used as reset
+	if function == "init" { //initialize the chaincode state, used as reset
 		return t.Init(stub, "init", args)
+	} else if function == "write" {
+		return t.write(stub, args)
 	}
-	fmt.Println("invoke did not find func: " + function)					//error
+	fmt.Println("invoke did not find func: " + function) //error
 
 	return nil, errors.New("Received unknown function invocation: " + function)
 }
 
 // Query is our entry point for queries
 func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
-	fmt.Println("query is running " + function)
+	fmt.Println("EW query is running " + function)
 
+	fmt.Println("EW function='"+function+"' equality="+function == "read")
 	// Handle different functions
-	if function == "dummy_query" {											//read a variable
-		fmt.Println("hi there " + function)						//error
-		return nil, nil;
+	if function == "read" {
+		fmt.Println("EW query is in 'read' branch")
+		return t.read(stub, args)
+	} else if function == "dummy_query" { //read a variable
+		fmt.Println("EW hi there " + function) //error
+		return nil, nil
 	}
-	fmt.Println("query did not find func: " + function)						//error
+	fmt.Println("EW query did not find func: " + function) //error
 
-	return nil, errors.New("Received unknown function query: " + function)
+	return nil, errors.New("EW Received unknown function query: " + function)
+}
+
+///
+/// Helper methods on SimpleChainCode
+///
+func (t *SimpleChaincode) write(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	var key, value string
+	var err error
+
+	fmt.Println("running write()")
+
+	if len(args) != 2 {
+		return nil, errors.New("Wrong number of arguments - expected key and value strings")
+	}
+
+	key = args[0]
+	value = args[1]
+	err = stub.PutState(key, []byte(value))
+	if err != nil {
+		return nil, err
+	}
+	return nil, nil
+}
+
+func (t *SimpleChaincode) read(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	var key, jsonResult string
+	var err error
+	var valAsBytes []byte
+
+	if len(args) != 1 {
+		return nil, errors.New("Wrong number of arguments, expected key to search for")
+	}
+
+	key = args[0]
+	valAsBytes, err = stub.GetState(key)
+	if err != nil {
+		jsonResult = "{\"Error\":\"Failed to find state for key '" + key + "'\"}"
+		return nil, errors.New(jsonResult)
+	}
+	return valAsBytes, nil
 }
